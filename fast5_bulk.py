@@ -1,13 +1,6 @@
-import warnings
+import h5py
 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=FutureWarning)
-    import h5py
-
-import numpy as np
-
-
-from util import _clean_attrs, _sanitize_data_for_writing
+from util import _clean_attrs
 
 
 class BulkFast5(h5py.File):
