@@ -1,6 +1,6 @@
 import h5py
 
-from util import _clean_attrs
+from .util import _clean_attrs
 
 
 class BulkFast5(h5py.File):
