@@ -1,4 +1,5 @@
 import h5py
+import vbz_h5py_plugin
 
 from .util import _clean_attrs
 
