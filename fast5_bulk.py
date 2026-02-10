@@ -1,5 +1,6 @@
 import h5py
 import vbz_h5py_plugin
+from numpy.typing import NDArray
 
 from .util import _clean_attrs
 
@@ -53,7 +54,7 @@ class BulkFast5(h5py.File):
         super(BulkFast5, self).__init__(filename, mode)
         if mode == 'r':
             data = self[self.__intermediate_data__]
-            self.channels = sorted([int(name.strip('Channel_')) for name in data.keys()])
+            self.channels = sorted([int(name.strip('Channel_')) for name in data.keys()]) # type: ignore
             self.parsed_exp_history = None # we parse the history lazily
 
             # Parse experimental metadata
@@ -66,7 +67,7 @@ class BulkFast5(h5py.File):
 
             # This should be safe
             try:
-                self.sample_rate = float(self['Meta'].attrs['sample_rate'])
+                self.sample_rate = float(self['Meta'].attrs['sample_rate']) # type: ignore
             except:
                 self.sample_rate = float(self.get_metadata(self.channels[0])['sample_rate'])
 
@@ -134,7 +135,7 @@ class BulkFast5(h5py.File):
         location_split = location.split('/')
         folder = '/'.join(location_split[:-1])
         name = location_split[-1]
-        present = folder in self and name in self[folder].keys()
+        present = folder in self and name in self[folder].keys() # type: ignore
         self._cached_paths[location] = present
         return present
 
@@ -165,13 +166,13 @@ class BulkFast5(h5py.File):
         if 'scaling_used' not in meta_data or meta_data.get('scaling_used'):
             return data
         else:
-            channel_scale = meta_data['range'] / meta_data['digitisation']
+            channel_scale = meta_data['range'] / meta_data['digitisation'] # type: ignore
             channel_offset = meta_data['offset']
             data['mean'] = (data['mean'] + channel_offset) * channel_scale
             return data
 
 
-    def get_raw(self, channel, times=None, raw_indices=(None, None), use_scaling=True):
+    def get_raw(self, channel, times=None, raw_indices=(None, None), use_scaling=True) -> NDArray:
         """If available, parse channel raw data.
 
         :param channel: channel number int
@@ -192,11 +193,11 @@ class BulkFast5(h5py.File):
             raw_indices = self._time_interval_to_index(channel, times)
 
         raw_data = self.__raw_data__.format(channel)
-        data = self[raw_data][raw_indices[0]:raw_indices[1]]
+        data = self[raw_data][raw_indices[0]:raw_indices[1]] # type: ignore
 
         if use_scaling:
             meta_data = self.get_metadata(channel)
-            raw_unit = meta_data['range'] / meta_data['digitisation']
-            data = (data + meta_data['offset']) * raw_unit
+            raw_unit = meta_data['range'] / meta_data['digitisation'] # type: ignore
+            data = (data + meta_data['offset']) * raw_unit # type: ignore
 
-        return data
+        return data # pyright: ignore[reportReturnType]
